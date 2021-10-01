@@ -1,18 +1,18 @@
 {
   "linux": {
-    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1286647734/Linux_x64_php.zip",
+    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1293168272/Linux_x64_php.zip",
     "aarch64": null
   },
   "darwin": {
-    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1286647734/MacOS_x64_php.zip",
+    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1293168272/MacOS_x64_php.zip",
     "aarch64": null
   },
   "win32": {
-    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1286647734/Windows_x64_php.zip",
+    "x64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1293168272/Windows_x64_php.zip",
     "aarch64": null
   },
   "android": {
-    "aarch64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1286647734/Android_aarch64_php.zip",
+    "aarch64": "https://github.com/The-Bds-Maneger/Php_Static_Binary/releases/download/php_bin_1293168272/Android_aarch64_php.zip",
     "x64": null
   },
   "other": []
