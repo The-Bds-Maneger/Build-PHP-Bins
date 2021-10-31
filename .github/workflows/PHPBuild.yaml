@@ -3,10 +3,8 @@ on:
   push:
     branches:
       - "main"
-    paths-ignore: 
-      - ".github"
-  schedule:
-    - cron: "0 0 */15 * *"
+    paths: 
+      - "/php_build/"
   watch:
     type: [started]
 
