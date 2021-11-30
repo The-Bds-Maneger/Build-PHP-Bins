@@ -27,7 +27,7 @@ jobs:
           submodules: true
 
       - name: Node Setup
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: 16.x
 
@@ -82,7 +82,7 @@ jobs:
     steps:
       # Setup Node
       - name: Setup Node JS
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2.5.0
         with:
           node-version: 16.x
 
