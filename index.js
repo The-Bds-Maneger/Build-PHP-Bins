@@ -46,6 +46,7 @@ async function CreateZip(Folder = "./bin", MoreToFileName = "") {
   return fs.writeFileSync(path.resolve(__dirname, MoreToFileName+"_bin.zip"), Zip.toBuffer());
 }
 (async() => {
+  console.log("Host info, Arch:", CurrentArch, "System:", CurrentPlatform);
   const Opt = Yargs.help().version(false).parse();
   const Platform = (Opt.target||Opt.t)||CurrentPlatform;
   const arch = (Opt.arch||Opt.a)||CurrentArch;
