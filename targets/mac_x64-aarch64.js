@@ -16,7 +16,7 @@ exports.Mac_Intel = async function Mac_Intel() {
         process.env.LDFLAGS = "-L/usr/local/opt/bison/lib"
 
         // Build php
-        const macos_build = child_process.execFile(path.resolve(__dirname, "../php_build/compile.sh"), ["-t", "mac-x86-64", `-j${os.cpus().length}`, "-g", "-l"], {
+        const macos_build = child_process.execFile(path.resolve(__dirname, "../php_build/compile.sh"), ["-t", "mac-x86-64", `-j${os.cpus().length}`, "-f", "-g", "-3"], {
             cwd: path.resolve(__dirname, "../php_build")
         });
         macos_build.stdout.on("data", data => process.stdout.write(data));
