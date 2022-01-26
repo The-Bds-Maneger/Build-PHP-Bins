@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - "main"
-    paths: 
-      - "/php_build/"
   watch:
     type: [started]
 
@@ -67,69 +65,27 @@ jobs:
         if: matrix.os != 'windows-latest'
         continue-on-error: true
         run: npm run build
-
-      # Upload Artifacts
-      - uses: actions/upload-artifact@v2
-        with:
-          name: "php_build_on_${{ matrix.os }}"
-          path: "*_php.zip"
-          retention-days: 1
-
-
-  Publish:
-    runs-on: ubuntu-latest
-    needs: Build
-    steps:
-      # Setup Node
-      - name: Setup Node JS
-        uses: actions/setup-node@v2.5.1
-        with:
-          node-version: 16.x
-
-      # Download Files
-      - name: Download Bins
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/TMPBins
-      - run: |
-          mkdir -p /tmp/Bins/
-          mv -v /tmp/TMPBins/*/*.zip /tmp/Bins/
-
-      # Prepare files
-      - name: Publish PHP files bin
-        uses: softprops/action-gh-release@v0.1.8
+      
+      # Upload Artifacts- name: Publish PHP files bin
+      - uses: softprops/action-gh-release@v0.1.8
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           name: "PHP Binary: ${{ github.run_id }}"
           tag_name: php_bin_${{ github.run_id }}
-          files: |
-            /tmp/Bins/*.zip
+          files: *_php.zip
           body: |
             Windows users install the [Microsoft Visual C ++ 2017 Redistributable](https://aka.ms/vs/15/release/vc_redist.x64.exe)
 
-      - uses: actions/checkout@main
-
-      - name: Install node dependencies
-        run: npm install
-
-      - name: Create New JSON
-        run: tag_name="php_bin_${{ github.run_id }}" node create_json.js
-
-      - name: Publish php_bin.json
-        run: |
-          set -ex
-          git config --global user.email 'github-actions@github.com'
-          git config --global user.name 'github-actions[bot]'
-          git config --global http.postBuffer 157286400 sslVerify=false
-          git add ./binarys.json
-          git commit -m "Publish PHP bins Json" -m "Run id: ${{ github.run_id }}"
-          git push
-
+  CleanReleases:
+    runs-on: ubuntu-latest
+    needs: Build
+    steps:
       - name: Remove old Releases
         uses: Sirherobrine23/delete-older-releases@master
         with:
-          keep_latest: 1
+          keep_latest: 2
           delete_tags: true
           pattern_regex: true
           delete_tag_pattern: php_bin_.*
