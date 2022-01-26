@@ -66,7 +66,7 @@ jobs:
         continue-on-error: true
         run: npm run build
       
-      # Upload Artifacts- name: Publish PHP files bin
+      # Upload
       - uses: softprops/action-gh-release@v0.1.8
         continue-on-error: true
         env:
@@ -74,7 +74,7 @@ jobs:
         with:
           name: "PHP Binary: ${{ github.run_id }}"
           tag_name: php_bin_${{ github.run_id }}
-          files: *_php.zip
+          files: "*_php.zip"
           body: |
             Windows users install the [Microsoft Visual C ++ 2017 Redistributable](https://aka.ms/vs/15/release/vc_redist.x64.exe)
 
