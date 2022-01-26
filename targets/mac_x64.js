@@ -3,7 +3,7 @@ const path = require("path");
 const os = require("os");
 
 module.exports = {
-  target: /MacOS|Mac|mac|macos/gi,
+  target: /MacOS|Mac|mac|macos|darwin|Darwin/gi,
   arch: /x64/gi,
   build: Mac_Intel,
   zipOut: "darwin_x64"

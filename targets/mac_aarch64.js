@@ -4,7 +4,7 @@ const os = require("os");
 
 module.exports = {
   build: Mac_aarch64,
-  target: /MacOS|Mac|mac|macos/gi,
+  target: /MacOS|Mac|mac|macos|darwin|Darwin/gi,
   arch: /aarch64|arm64/gi,
   zipOut: "darwin_arm64"
 };
