@@ -53,7 +53,8 @@ jobs:
         run: brew install libtool autoconf automake pkg-config bison re2c
 
       - name: Linux Install musl-cross-installer
-        run: node index.js --pre_install
+        if: matrix.os == 'ubuntu-latest'
+        run: node index.js --pre_install --target=android --arch=arm64
 
       - name: "Building PHP to ${{ matrix.os }}"
         continue-on-error: true
