@@ -6,7 +6,7 @@ on:
   watch:
     type: [started]
   schedule:
-    - cron: "* * * * 7"
+    - cron: "* * * * 6"
 
 jobs:
   Build:
