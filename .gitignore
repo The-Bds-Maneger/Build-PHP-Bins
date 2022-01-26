@@ -5,4 +5,4 @@ node_modules/
 php_build
 
 # Zip Files
-.*_bin.zip
+*_bin.zip
