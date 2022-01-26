@@ -5,10 +5,16 @@ on:
       - "main"
   watch:
     type: [started]
-
+  schedule:
+    - "* * * * 7"
 
 jobs:
   Build:
+    runs-on: "${{ matrix.os }}"
+    name: "Building PHP Binary to ${{ matrix.os }}"
+    env:
+      VS_EDITION: Enterprise
+      SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
     strategy:
       fail-fast: false
       matrix:
@@ -16,8 +22,6 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
-    runs-on: "${{ matrix.os }}"
-    name: "PHP to ${{ matrix.os }}"
     steps:
       - name: Clone Repository
         uses: actions/checkout@main
@@ -40,10 +44,6 @@ jobs:
           sudo apt update
           sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
 
-      - name: Linux Install musl-cross-installer
-        if: matrix.os == 'ubuntu-latest'
-        run: npm run musl
-
       - name: Windows Depencies Install
         if: matrix.os == 'windows-latest'
         run: choco install wget --no-progress
@@ -52,19 +52,16 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: brew install libtool autoconf automake pkg-config bison re2c
 
-      # Windows Build
-      - name: Windows Build php
-        if: matrix.os == 'windows-latest'
-        env:
-          VS_EDITION: Enterprise
-          SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
-        run: npm run build
+      - name: Linux Install musl-cross-installer
+        run: node index.js --pre_install
 
-      # Linux/MacOS Build
-      - name: Linux/MacOS Build php
-        if: matrix.os != 'windows-latest'
+      - name: "Building PHP to ${{ matrix.os }}"
         continue-on-error: true
-        run: npm run build
+        run: node index.js
+
+      - name: Build PHP to Android
+        if: matrix.os == 'ubuntu-latest'
+        run: node index.js --target=android --arch=arm64
       
       # Upload
       - uses: softprops/action-gh-release@v0.1.8
@@ -72,11 +69,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: "PHP Binary: ${{ github.run_id }}"
+          name: PHP Binary Release
           tag_name: php_bin_${{ github.run_id }}
-          files: "*_php.zip"
-          body: |
-            Windows users install the [Microsoft Visual C ++ 2017 Redistributable](https://aka.ms/vs/15/release/vc_redist.x64.exe)
+          files: "*_bin.zip"
+          body: "Build file from ${{ matrix.os }}"
 
   CleanReleases:
     runs-on: ubuntu-latest

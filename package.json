@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/The-Bds-Maneger/Php_Static_Binary#readme",
   "dependencies": {
-    "adm-zip": "^0.5.9"
+    "adm-zip": "^0.5.9",
+    "yargs": "^17.3.1"
   },
   "devDependencies": {
     "eslint": "^8.7.0"
