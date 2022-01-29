@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - "main"
-  watch:
-    type: [started]
   schedule:
     - cron: "0 0 * * 6"
 
