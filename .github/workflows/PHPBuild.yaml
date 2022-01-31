@@ -58,12 +58,13 @@ jobs:
         continue-on-error: true
         run: node index.js
 
-      - name: Build PHP to Android
+      - name: Build PHP to Android arm64
         if: matrix.os == 'ubuntu-latest'
         run: node index.js --target=android --arch=arm64
 
-      - name: Build PHP to Android
+      - name: Build PHP to M1
         if: matrix.os == 'macos-latest'
+        continue-on-error: true
         run: node index.js --arch=arm64
       
       # Upload
