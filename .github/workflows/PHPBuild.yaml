@@ -61,6 +61,10 @@ jobs:
       - name: Build PHP to Android
         if: matrix.os == 'ubuntu-latest'
         run: node index.js --target=android --arch=arm64
+
+      - name: Build PHP to Android
+        if: matrix.os == 'macos-latest'
+        run: node index.js --arch=arm64
       
       # Upload
       - uses: softprops/action-gh-release@v0.1.8
