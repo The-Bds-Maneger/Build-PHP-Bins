@@ -35,7 +35,7 @@ jobs:
         run: npm install
 
       - name: Linux Depencies Install
-        if: matrix.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -43,27 +43,27 @@ jobs:
           sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
 
       - name: Windows Depencies Install
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         run: choco install wget --no-progress
 
       - name: MacOS Depencies Install
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         run: brew install libtool autoconf automake pkg-config bison re2c
 
       - name: Linux Install musl-cross-installer
-        if: matrix.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         run: node index.js --pre_install --target=android --arch=arm64
 
-      - name: "Building PHP to ${{ matrix.os }}"
+      - name: "Building PHP to ${{ runner.os }}"
         continue-on-error: true
         run: node index.js
 
       - name: Build PHP to Android arm64
-        if: matrix.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         run: node index.js --target=android --arch=arm64
 
       - name: Build PHP to M1
-        if: matrix.os == 'macos-latest'
+        if: runner.os == 'macOS'
         continue-on-error: true
         run: node index.js --arch=arm64
       
