@@ -9,7 +9,7 @@ on:
 jobs:
   Build:
     runs-on: "${{ matrix.os }}"
-    name: "Building PHP Binary to ${{ runner.os }}"
+    name: "Building PHP Binary to ${{ matrix.os }}"
     env:
       VS_EDITION: Enterprise
       SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
