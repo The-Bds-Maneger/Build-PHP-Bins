@@ -21,7 +21,7 @@ jobs:
       - name: Install dependecies
         run: brew install libtool autoconf automake pkg-config bison re2c
 
-      - name: "Building php bin"
+      - name: "Building php to MacoS
         env: 
           LDFLAGS: "-L /usr/local/opt/bison/lib"
         continue-on-error: true
@@ -29,15 +29,23 @@ jobs:
           export PATH="/usr/local/opt/bison/bin:${PATH}"
           ./compile.sh -t mac-x86-64 -f -g -j$(nproc)
 
-      - name: Build PHP to M1
-        continue-on-error: true
-        run: |
-          export PATH="/usr/local/opt/bison/bin:${PATH}"
-          ./compile.sh -t mac-arm64 -f -g -j$(nproc)
-  
-  win32:
-    runs-on: windows-2019
-    name: Windows
+      - name: Show Log
+        run: cat *.log
+
+      - name: Create tarball
+        run: zip macos_x64.zip bin
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos_x64
+          path: |
+            *.zip
+            *.log
+
+  # MacOS Build
+  macosarm64:
+    runs-on: macos-latest
+    name: MacOS arm64
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
@@ -45,14 +53,27 @@ jobs:
           repository: pmmp/php-build-scripts
           submodules: true
 
-      - name: Windows Depencies Install
-        if: runner.os == 'Windows'
-        run: choco install wget --no-progress
+      - name: Install dependecies
+        run: brew install libtool autoconf automake pkg-config bison re2c
 
-      - name: "Building php bin"
+      - name: "Building php to MacoS arm64"
         continue-on-error: true
-        run: .\windows-compile-vs.bat
+        run: |
+          export PATH="/usr/local/opt/bison/bin:${PATH}"
+          ./compile.sh -t mac-arm64 -f -g -j$(nproc)
 
+      - name: Show Log
+        run: cat *.log
+
+      - name: Create tarball
+        run: zip macos_arm64.zip bin
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos_arm64
+          path: |
+            *.zip
+            *.log
   linux:
     runs-on: ubuntu-latest
     name: Linux
@@ -74,6 +95,18 @@ jobs:
         continue-on-error: true
         run: ./compile.sh -j$(nproc)
 
+      - name: Show Log
+        run: cat *.log
+
+      - name: Create tarball
+        run: zip linux_x64.zip bin
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64
+          path: |
+            *.zip
+            *.log
   android:
     runs-on: ubuntu-latest
     name: Android
@@ -96,3 +129,43 @@ jobs:
       - name: "Building php bin"
         continue-on-error: true
         run: ./compile.sh -t android-aarch64 -x -f -g -j$(nproc)
+
+      - name: Show Log
+        run: cat *.log
+
+      - name: Create tarball
+        run: zip linux_aach64.zip bin
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: android_aarch64
+          path: |
+            *.zip
+            *.log
+  win32:
+    runs-on: windows-2019
+    name: Windows
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Windows Depencies Install
+        if: runner.os == 'Windows'
+        run: choco install wget --no-progress
+
+      - name: "Building php bin"
+        continue-on-error: true
+        run: .\windows-compile-vs.bat
+      
+      - name: show log
+        run: type compile.log
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows
+          path: |
+            php-*.zip
