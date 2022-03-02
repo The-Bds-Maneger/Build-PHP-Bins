@@ -2,7 +2,7 @@ name: PHP Bin build
 on:
   push:
     branches:
-      - "bds_zips"
+      - main
   schedule:
     - cron: "0 0 * * 6"
 
