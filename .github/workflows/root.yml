@@ -51,7 +51,7 @@ jobs:
 
       - name: "Building php bin"
         continue-on-error: true
-        run: windows-compile-vs.bat
+        run: .\windows-compile-vs.bat
 
   linux:
     runs-on: ubuntu-latest
