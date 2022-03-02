@@ -1,47 +1,92 @@
-name: Publish musl docker image
+name: PHP Bin build
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - "bds_zips"
   schedule:
-    - cron: "26 8 * * 1"
-  release:
-    types:
-      - released
-
-env:
-  DOCKERPLATFORM: "linux/amd64"
+    - cron: "0 0 * * 6"
 
 jobs:
-  android_musl:
-    runs-on: ubuntu-latest
-    name: Publish Server image
+  # MacOS Build
+  macos:
+    runs-on: macos-latest
+    name: MacOS
     steps:
-      - uses: actions/checkout@v2.4.0
+      - name: Clone Repository
+        uses: actions/checkout@v3
         with:
+          repository: pmmp/php-build-scripts
           submodules: true
 
-      - name: Setup QEMU to Docker
-        uses: docker/setup-qemu-action@v1
+      - name: Install dependecies
+        run: brew install libtool autoconf automake pkg-config bison re2c
 
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: "Building php bin"
+        continue-on-error: true
+        run: compile.sh -t mac-x86-64 -f -g -j$(nproc)
 
-      - name: Login into registry Github Packages
-        uses: docker/login-action@v1
+      - name: Build PHP to M1
+        continue-on-error: true
+        run: compile.sh -t mac-arm64 -f -g -j$(nproc)
+  
+  win32:
+    runs-on: windows-2019
+    name: Windows
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          repository: pmmp/php-build-scripts
+          submodules: true
 
-      - name: Publish docker image
-        id: pre_build
-        uses: docker/build-push-action@v2
+      - name: Windows Depencies Install
+        if: runner.os == 'Windows'
+        run: choco install wget --no-progress
+
+      - name: "Building php bin"
+        continue-on-error: true
+        run: windows-compile-vs.bat
+
+  linux:
+    runs-on: ubuntu-latest
+    name: Linux
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
         with:
-          context: .
-          push: true
-          tags: ghcr.io/the-bds-maneger/android_musl:latest
-          platforms: ${{ env.DOCKERPLATFORM }}
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Linux Depencies Install
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
+
+      - name: "Building php bin"
+        continue-on-error: true
+        run: compile.sh -j$(nproc)
+
+  android:
+    runs-on: ubuntu-latest
+    name: Android
+    container:
+      image: ghcr.io/the-bds-maneger/android_musl:latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Linux Depencies Install
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt update
+          apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
+
+      - name: "Building php bin"
+        continue-on-error: true
+        run: compile.sh -t android-aarch64 -x -f -g -j$(nproc)
