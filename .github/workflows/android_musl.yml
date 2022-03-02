@@ -3,14 +3,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+    paths:
+      - /Dockerfile
   schedule:
     - cron: "26 8 * * 1"
-  release:
-    types:
-      - released
 
 env:
   DOCKERPLATFORM: "linux/amd64"
