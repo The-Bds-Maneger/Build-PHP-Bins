@@ -23,11 +23,11 @@ jobs:
 
       - name: "Building php bin"
         continue-on-error: true
-        run: compile.sh -t mac-x86-64 -f -g -j$(nproc)
+        run: ./compile.sh -t mac-x86-64 -f -g -j$(nproc)
 
       - name: Build PHP to M1
         continue-on-error: true
-        run: compile.sh -t mac-arm64 -f -g -j$(nproc)
+        run: ./compile.sh -t mac-arm64 -f -g -j$(nproc)
   
   win32:
     runs-on: windows-2019
@@ -66,7 +66,7 @@ jobs:
 
       - name: "Building php bin"
         continue-on-error: true
-        run: compile.sh -j$(nproc)
+        run: ./compile.sh -j$(nproc)
 
   android:
     runs-on: ubuntu-latest
@@ -89,4 +89,4 @@ jobs:
 
       - name: "Building php bin"
         continue-on-error: true
-        run: compile.sh -t android-aarch64 -x -f -g -j$(nproc)
+        run: ./compile.sh -t android-aarch64 -x -f -g -j$(nproc)
