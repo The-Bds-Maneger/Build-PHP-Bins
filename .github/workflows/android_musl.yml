@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - /Dockerfile
+      - /musl.Dockerfile
   schedule:
     - cron: "26 8 * * 1"
 
@@ -38,6 +38,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          file: musl.Dockerfile
           push: true
           tags: ghcr.io/the-bds-maneger/android_musl:latest
           platforms: ${{ env.DOCKERPLATFORM }}

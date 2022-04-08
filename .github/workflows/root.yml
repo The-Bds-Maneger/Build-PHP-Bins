@@ -1,12 +1,46 @@
 name: PHP Bin build
 on:
+  schedule:
+    - cron: "0 0 * * 6"
   push:
     branches:
       - main
-  schedule:
-    - cron: "0 0 * * 6"
 
 jobs:
+  # Windows build
+  win32:
+    runs-on: windows-2019
+    name: Windows
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Windows Depencies Install
+        run: choco install --no-progress wget
+
+      - name: "Building php bin"
+        run: .\windows-compile-vs.bat
+        env:
+          VS_EDITION: Enterprise
+          SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
+      
+      - name: show log
+        run: type compile.log
+
+      - name: Create tarball (tar.gz)
+        run: 7z a -ttar -so dwt.tar bin/ | 7z a -si windows_x64.tar.gz
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows
+          path: |
+            php-*.zip
+            *.tar.gz
+
   # MacOS Build
   macos:
     runs-on: macos-latest
@@ -19,27 +53,34 @@ jobs:
           submodules: true
 
       - name: Install dependecies
-        run: brew install libtool autoconf automake pkg-config bison re2c
+        run: brew install libtool autoconf automake pkg-config bison re2c tar
 
       - name: "Building php to MacoS"
         env: 
           LDFLAGS: "-L /usr/local/opt/bison/lib"
-        continue-on-error: true
         run: |
           export PATH="/usr/local/opt/bison/bin:${PATH}"
-          ./compile.sh -t mac-x86-64 -f -g -j$(nproc)
+          ./compile.sh -t mac-x86-64 -f -g
 
       - name: Show Log
         run: cat *.log
 
       - name: Create tarball
-        run: zip macos_x64.zip bin
+        run: zip macos_x64.zip bin/*
+
+      - name: Create tarball (tar.gz)
+        run: |
+          bin/*
+          pwd
+          tar czf ../macos_x64.tar.gz *
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: macos_x64
           path: |
             *.zip
+            *.tar.gz
             *.log
 
   # MacOS Build
@@ -54,59 +95,35 @@ jobs:
           submodules: true
 
       - name: Install dependecies
-        run: brew install libtool autoconf automake pkg-config bison re2c
+        run: brew install libtool autoconf automake pkg-config bison re2c tar
 
       - name: "Building php to MacoS arm64"
-        continue-on-error: true
         run: |
           export PATH="/usr/local/opt/bison/bin:${PATH}"
-          ./compile.sh -t mac-arm64 -f -g -j$(nproc)
+          ./compile.sh -t mac-arm64 -f -g
 
       - name: Show Log
         run: cat *.log
 
-      - name: Create tarball
-        run: zip macos_arm64.zip bin
+      - name: Create tarball (zip)
+        run: zip macos_arm64.zip bin/*
+
+      - name: Create tarball (tar.gz)
+        run: |
+          bin/*
+          pwd
+          tar czf ../macos_arm64.tar.gz *
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: macos_arm64
           path: |
             *.zip
+            *.tar.gz
             *.log
-  linux:
-    runs-on: ubuntu-latest
-    name: Linux
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
-        with:
-          repository: pmmp/php-build-scripts
-          submodules: true
 
-      - name: Linux Depencies Install
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
-
-      - name: "Building php bin"
-        continue-on-error: true
-        run: ./compile.sh -j$(nproc)
-
-      - name: Show Log
-        run: cat *.log
-
-      - name: Create tarball
-        run: zip linux_x64.zip bin
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x64
-          path: |
-            *.zip
-            *.log
+  # Android Build arm64
   android:
     runs-on: ubuntu-latest
     name: Android
@@ -124,27 +141,36 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           apt update
-          apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip
+          apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
 
       - name: "Building php bin"
-        continue-on-error: true
         run: ./compile.sh -t android-aarch64 -x -f -g -j$(nproc)
 
       - name: Show Log
         run: cat *.log
 
-      - name: Create tarball
-        run: zip linux_aach64.zip bin
+      - name: Create tarball (zip)
+        run: zip android_arm64.zip bin/*
+
+      - name: Create tarball (tar.gz)
+        run: |
+          bin/*
+          pwd
+          tar czf ../android_arm64.tar.gz *
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: android_aarch64
+          name: android_arm64
           path: |
             *.zip
+            *.tar.gz
             *.log
-  win32:
-    runs-on: windows-2019
-    name: Windows
+
+  # Linux Build
+  linux:
+    runs-on: ubuntu-latest
+    name: Linux amd64
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
@@ -152,20 +178,66 @@ jobs:
           repository: pmmp/php-build-scripts
           submodules: true
 
-      - name: Windows Depencies Install
-        if: runner.os == 'Windows'
-        run: choco install wget --no-progress
+      - name: Linux Depencies Install
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
 
       - name: "Building php bin"
-        continue-on-error: true
-        run: .\windows-compile-vs.bat
-      
-      - name: show log
-        run: type compile.log
+        run: ./compile.sh -j$(nproc)
+
+      - name: Show Log
+        run: cat *.log
+
+      - name: Create tarball (zip)
+        run: zip linux_x64.zip bin/*
+
+      - name: Create tarball (tar.gz)
+        run: |
+          bin/*
+          pwd
+          tar czf ../linux_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Windows
+          name: linux_x64
           path: |
-            php-*.zip
+            *.zip
+            *.tar.gz
+            *.log
+
+  # Linux Build arm64
+  linuxmultiarch:
+    runs-on: ubuntu-latest
+    name: Linux multi arch
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+
+      - name: Setup QEMU to Docker
+        uses: docker/setup-qemu-action@v1
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Install Unzip and zip
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt install -y unzip zip
+
+      - name: Build arm64
+        run: docker buildx build . --platform linux/arm64 --output type=local,dest=out_arm64
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_multi
+          path: |
+            out_*/home/copiler/php_build_scripts/*.zip
+            out_*/home/copiler/php_build_scripts/*.tar.gz
+            out_*/home/copiler/php_build_scripts/*.log
