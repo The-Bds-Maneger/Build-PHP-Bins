@@ -70,7 +70,7 @@ jobs:
 
       - name: Create tarball (tar.gz)
         run: |
-          bin/*
+          cd bin/*
           pwd
           tar czf ../macos_x64.tar.gz *
 
@@ -110,7 +110,7 @@ jobs:
 
       - name: Create tarball (tar.gz)
         run: |
-          bin/*
+          cd bin/*
           pwd
           tar czf ../macos_arm64.tar.gz *
 
@@ -154,7 +154,7 @@ jobs:
 
       - name: Create tarball (tar.gz)
         run: |
-          bin/*
+          cd bin/*
           pwd
           tar czf ../android_arm64.tar.gz *
 
@@ -196,7 +196,7 @@ jobs:
 
       - name: Create tarball (tar.gz)
         run: |
-          bin/*
+          cd bin/*
           pwd
           tar czf ../linux_x64.tar.gz *
 
