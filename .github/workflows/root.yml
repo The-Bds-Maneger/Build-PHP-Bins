@@ -53,7 +53,7 @@ jobs:
           submodules: true
 
       - name: Install dependecies
-        run: brew install libtool autoconf automake pkg-config bison re2c tar
+        run: brew install libtool autoconf automake pkg-config bison re2c
 
       - name: "Building php to MacoS"
         env: 
@@ -95,7 +95,7 @@ jobs:
           submodules: true
 
       - name: Install dependecies
-        run: brew install libtool autoconf automake pkg-config bison re2c tar
+        run: brew install libtool autoconf automake pkg-config bison re2c
 
       - name: "Building php to MacoS arm64"
         run: |
