@@ -55,7 +55,7 @@ jobs:
 
   # MacOS Build
   macos:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     name: MacOS
     steps:
       - name: Clone Repository
@@ -112,7 +112,7 @@ jobs:
 
   # MacOS Build
   macosarm64:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     name: MacOS arm64
     steps:
       - name: Clone Repository
