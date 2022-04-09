@@ -41,6 +41,18 @@ jobs:
             php-*.zip
             *.tar.gz
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: Windows
+          files: |
+            php-*.zip
+            *.tar.gz
+
   # MacOS Build
   macos:
     runs-on: macos-latest
@@ -85,6 +97,19 @@ jobs:
             *.tar.gz
             *.log
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: macos_x64
+          files: |
+            *.zip
+            *.tar.gz
+            *.tar.gz
+
   # MacOS Build
   macosarm64:
     runs-on: macos-latest
@@ -126,6 +151,19 @@ jobs:
             *.zip
             *.tar.gz
             *.log
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: macos_arm64
+          files: |
+            *.zip
+            *.tar.gz
+            *.tar.gz
 
   # Android Build arm64
   android:
@@ -171,6 +209,19 @@ jobs:
             *.tar.gz
             *.log
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: android_arm64
+          files: |
+            *.zip
+            *.tar.gz
+            *.tar.gz
+
   # Linux Build
   linux:
     runs-on: ubuntu-latest
@@ -213,35 +264,60 @@ jobs:
             *.tar.gz
             *.log
 
-  # Linux Build arm64
-  linuxmultiarch:
-    runs-on: ubuntu-latest
-    name: Linux multi arch
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
-
-      - name: Setup QEMU to Docker
-        uses: docker/setup-qemu-action@v1
-
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Install Unzip and zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
         env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt update
-          sudo apt install -y unzip zip
-
-      - name: Build arm64
-        run: docker buildx build . --platform linux/arm64 --output type=local,dest=out_arm64
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: linux_multi
-          path: |
-            out_*/home/copiler/php_build_scripts/*.zip
-            out_*/home/copiler/php_build_scripts/*.tar.gz
-            out_*/home/copiler/php_build_scripts/*.log
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: linux_x64
+          files: |
+            *.zip
+            *.tar.gz
+            *.tar.gz
+
+  # # Linux Build arm64
+  # linuxmultiarch:
+  #   runs-on: ubuntu-latest
+  #   name: Linux multi arch
+  #   steps:
+  #     - name: Clone Repository
+  #       uses: actions/checkout@v3
+
+  #     - name: Setup QEMU to Docker
+  #       uses: docker/setup-qemu-action@v1
+
+  #     - name: Setup Buildx
+  #       uses: docker/setup-buildx-action@v1
+
+  #     - name: Install Unzip and zip
+  #       env:
+  #         DEBIAN_FRONTEND: noninteractive
+  #       run: |
+  #         sudo apt update
+  #         sudo apt install -y unzip zip
+
+  #     - name: Build arm64
+  #       run: docker buildx build . --platform linux/arm64 --output type=local,dest=out_arm64
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: linux_multi
+  #         path: |
+  #           out_*/home/copiler/php_build_scripts/*.zip
+  #           out_*/home/copiler/php_build_scripts/*.tar.gz
+  #           out_*/home/copiler/php_build_scripts/*.log
+
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         name: Pocketmine
+  #         tag_name: "Pocketmine${{ github.run_id }}"
+  #         body: Windows
+  #         files: |
+  #           out_*/home/copiler/php_build_scripts/*.zip
+  #           out_*/home/copiler/php_build_scripts/*.tar.gz
