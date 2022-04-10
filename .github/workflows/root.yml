@@ -220,6 +220,7 @@ jobs:
         run: brew install libtool autoconf automake pkg-config bison re2c
 
       - name: "Building php to MacOS arm64"
+        continue-on-error: true
         run: |
           export PATH="/usr/local/opt/bison/bin:$PATH"
           ./compile.sh -t mac-arm64 -j4 || (cat *.log && exit 1)
