@@ -86,7 +86,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czf ../macos_x64.tar.gz *
+          tar czfr ../macos_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -141,7 +141,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czf ../macos_arm64.tar.gz *
+          tar czfr ../macos_arm64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -198,7 +198,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czf ../android_arm64.tar.gz *
+          tar czfr ../android_arm64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -253,7 +253,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czf ../linux_x64.tar.gz *
+          tar czfr ../linux_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

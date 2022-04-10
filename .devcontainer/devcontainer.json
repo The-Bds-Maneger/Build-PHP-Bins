@@ -4,8 +4,7 @@
   "remoteUser": "gitpod",
   "containerUser": "gitpod",
   "updateRemoteUserUID": false,
-  "postCreateCommand": "screen -L -Logfile /tmp/dockerd.log -dmS dockerd sudo dockerd --ipv6 --fixed-cidr-v6 \"2001:db8:1::/64\"",
-  "postStartCommand": "npm install",
+  "postCreateCommand": "screen -L -Logfile /tmp/dockerd.log -dm sudo dockerd",
   "runArgs": [
     "--init",
     "--privileged"
