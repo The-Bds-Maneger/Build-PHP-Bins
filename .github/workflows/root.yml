@@ -38,7 +38,7 @@ jobs:
         with:
           name: Windows
           path: |
-            php-*.zip
+            *.zip
             *.tar.gz
 
       - name: Release
@@ -50,7 +50,7 @@ jobs:
           tag_name: "Pocketmine${{ github.run_id }}"
           body: Windows
           files: |
-            php-*.zip
+            *.zip
             *.tar.gz
 
   # MacOS Build
@@ -86,7 +86,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czfr ../macos_x64.tar.gz *
+          tar czfv ../macos_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -141,7 +141,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czfr ../macos_arm64.tar.gz *
+          tar czfv ../macos_arm64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -198,7 +198,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czfr ../android_arm64.tar.gz *
+          tar czfv ../android_arm64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -253,7 +253,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar czfr ../linux_x64.tar.gz *
+          tar czfv ../linux_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
