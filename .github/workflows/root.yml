@@ -85,7 +85,7 @@ jobs:
         run: |
           cd bin/*
           pwd
-          tar -czfv ../android_arm64.tar.gz *
+          tar czfv ../android_arm64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -112,7 +112,7 @@ jobs:
   # Linux Build
   linux:
     runs-on: ubuntu-latest
-    name: Linux amd64
+    name: Linux
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
@@ -142,12 +142,6 @@ jobs:
           name: linux_x64
           path: "*.tar.gz"
 
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x64_root
-          path: ./
-
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
@@ -157,6 +151,12 @@ jobs:
           tag_name: "Pocketmine${{ github.run_id }}"
           body: linux_x64
           files: "*.tar.gz"
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64_root
+          path: ./
 
   # MacOS Build
   macos:
@@ -177,33 +177,19 @@ jobs:
           LDFLAGS: "-L /usr/local/opt/bison/lib"
         run: |
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          set -ex
-          trap "exit 1" ERR
-          ./compile.sh -t mac-x86-64 -j4 -f -g
-
-      - name: Show Log
-        run: cat *.log
+          ./compile.sh -t mac-x86-64 -j4 -f -g || (cat *.log && exit 1)
 
       - name: Create tarballs
         run: |
           cd bin/*/
           pwd
-          tar -czfv ../darwin_x64.tar.gz *
+          tar czfv ../darwin_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: darwin_x64
-          path: |
-            *.zip
-            *.tar.gz
-            *.log
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: darwin_x64_root
-          path: ./
+          path: "*.tar.gz"
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -213,9 +199,13 @@ jobs:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
           body: macos_x64
-          files: |
-            *.zip
-            *.tar.gz
+          files: "*.tar.gz"
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: darwin_x64_root
+          path: ./
 
   # MacOS Build
   macosarm64:
@@ -234,14 +224,9 @@ jobs:
       - name: "Building php to MacoS arm64"
         run: |
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          set -ex
-          trap "exit 1" ERR
-          ./compile.sh -t mac-arm64 -j4 -f -g
+          ./compile.sh -t mac-arm64 -j4 -f -g || (cat *.log && exit 1)
 
-      - name: Show Log
-        run: cat *.log
-
-      - name: Create tarball (zip)
+      - name: Create tarball
         run: |
           cd bin/*/
           pwd
@@ -251,16 +236,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: macos_arm64
-          path: |
-            *.zip
-            *.tar.gz
-            *.log
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: macos_arm64_root
-          path: ./
+          path: "*.tar.gz"
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -270,7 +246,10 @@ jobs:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
           body: macos_arm64
-          files: |
-            *.zip
-            *.tar.gz
-            *.tar.gz
+          files: "*.tar.gz"
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos_arm64_root
+          path: ./
