@@ -46,15 +46,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Windows
-          path: |
-            *.zip
-            *.tar.gz
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows_root
-          path: ./
+          path: "*.zip"
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -64,9 +56,107 @@ jobs:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
           body: Windows
-          files: |
-            *.zip
-            *.tar.gz
+          files: "*.zip"
+
+  # Android Build arm64
+  android:
+    runs-on: ubuntu-latest
+    name: Android
+    container:
+      image: ghcr.io/the-bds-maneger/android_musl:latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Linux Depencies Install
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt update
+          apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
+
+      - name: "Building php bin"
+        run: ./compile.sh -t android-aarch64 -x -f -g -j$(nproc)
+
+      - name: Create tarball
+        run: |
+          cd bin/*
+          pwd
+          tar -czfv ../android_arm64.tar.gz *
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: android_arm64
+          path: "*.tar.gz"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: android_arm64
+          files: "*.tar.gz"
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: android_arm64_root
+          path: ./
+
+  # Linux Build
+  linux:
+    runs-on: ubuntu-latest
+    name: Linux amd64
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        with:
+          repository: pmmp/php-build-scripts
+          submodules: true
+
+      - name: Linux Depencies Install
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
+
+      - name: "Building php bin"
+        run: ./compile.sh -j$(nproc)
+
+      - name: Create tarball (tar.gz)
+        run: |
+          cd bin/*
+          pwd
+          tar czfv ../linux_x64.tar.gz *
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64
+          path: "*.tar.gz"
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64_root
+          path: ./
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Pocketmine
+          tag_name: "Pocketmine${{ github.run_id }}"
+          body: linux_x64
+          files: "*.tar.gz"
 
   # MacOS Build
   macos:
@@ -180,127 +270,6 @@ jobs:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
           body: macos_arm64
-          files: |
-            *.zip
-            *.tar.gz
-            *.tar.gz
-
-  # Android Build arm64
-  android:
-    runs-on: ubuntu-latest
-    name: Android
-    container:
-      image: ghcr.io/the-bds-maneger/android_musl:latest
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
-        with:
-          repository: pmmp/php-build-scripts
-          submodules: true
-
-      - name: Linux Depencies Install
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          apt update
-          apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
-
-      - name: "Building php bin"
-        run: ./compile.sh -t android-aarch64 -x -f -g -j$(nproc)
-
-      - name: Show Log
-        run: cat *.log
-
-      - name: Create tarball
-        run: |
-          cd bin/*
-          pwd
-          tar czfv ../android_arm64.tar.gz *
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: android_arm64
-          path: |
-            *.zip
-            *.tar.gz
-            *.log
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: android_arm64_root
-          path: ./
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: Pocketmine
-          tag_name: "Pocketmine${{ github.run_id }}"
-          body: android_arm64
-          files: |
-            *.zip
-            *.tar.gz
-            *.tar.gz
-
-  # Linux Build
-  linux:
-    runs-on: ubuntu-latest
-    name: Linux amd64
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
-        with:
-          repository: pmmp/php-build-scripts
-          submodules: true
-
-      - name: Linux Depencies Install
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
-
-      - name: "Building php bin"
-        run: ./compile.sh -j$(nproc)
-
-      - name: Show Log
-        run: cat *.log
-
-      - name: Create tarball (zip)
-        run: zip linux_x64.zip bin/*
-
-      - name: Create tarball (tar.gz)
-        run: |
-          cd bin/*
-          pwd
-          tar czfv ../linux_x64.tar.gz *
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x64
-          path: |
-            *.zip
-            *.tar.gz
-            *.log
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x64_root
-          path: ./
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: Pocketmine
-          tag_name: "Pocketmine${{ github.run_id }}"
-          body: linux_x64
           files: |
             *.zip
             *.tar.gz
