@@ -1,10 +1,10 @@
 name: PHP Bin build
 on:
-  schedule:
-    - cron: "0 0 * * 6"
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 0 * * 6"
 
 jobs:
   # Windows build
@@ -30,8 +30,17 @@ jobs:
       - name: show log
         run: type compile.log
 
-      - name: Create tarball (tar.gz)
-        run: 7z a -ttar -so dwt.tar bin/ | 7z a -si windows_x64.tar.gz
+      - name: Rename files
+        shell: node {0}
+        run: |
+          const fs = require("fs");
+          const path = require("path");
+          const files = fs.readdirSync(process.cwd()).filter(file => file.endsWith(".zip"));
+          for (const zip of files) {
+            console.log("File:", path.join(process.cwd(), zip));
+            if (/debug/i.test(zip)) fs.rmSync(path.join(process.cwd(), zip));
+            else fs.renameSync(path.join(process.cwd(), zip), path.join(process.cwd(), "win32_x64.zip"));
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -40,6 +49,12 @@ jobs:
           path: |
             *.zip
             *.tar.gz
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows_root
+          path: ./
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -79,23 +94,26 @@ jobs:
       - name: Show Log
         run: cat *.log
 
-      - name: Create tarball
-        run: zip macos_x64.zip bin/*
-
-      - name: Create tarball (tar.gz)
+      - name: Create tarballs
         run: |
-          cd bin/*
+          cd bin/*/
           pwd
-          tar czfv ../macos_x64.tar.gz *
+          tar -czfv ../darwin_x64.tar.gz *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: macos_x64
+          name: darwin_x64
           path: |
             *.zip
             *.tar.gz
             *.log
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: darwin_x64_root
+          path: ./
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -107,7 +125,6 @@ jobs:
           body: macos_x64
           files: |
             *.zip
-            *.tar.gz
             *.tar.gz
 
   # MacOS Build
@@ -135,11 +152,8 @@ jobs:
         run: cat *.log
 
       - name: Create tarball (zip)
-        run: zip macos_arm64.zip bin/*
-
-      - name: Create tarball (tar.gz)
         run: |
-          cd bin/*
+          cd bin/*/
           pwd
           tar czfv ../macos_arm64.tar.gz *
 
@@ -151,6 +165,12 @@ jobs:
             *.zip
             *.tar.gz
             *.log
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos_arm64_root
+          path: ./
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -191,10 +211,7 @@ jobs:
       - name: Show Log
         run: cat *.log
 
-      - name: Create tarball (zip)
-        run: zip android_arm64.zip bin/*
-
-      - name: Create tarball (tar.gz)
+      - name: Create tarball
         run: |
           cd bin/*
           pwd
@@ -208,6 +225,12 @@ jobs:
             *.zip
             *.tar.gz
             *.log
+
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: android_arm64_root
+          path: ./
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -264,6 +287,12 @@ jobs:
             *.tar.gz
             *.log
 
+      - name: Upload artifacts (root)
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64_root
+          path: ./
+
       - name: Release
         uses: softprops/action-gh-release@v1
         env:
@@ -276,48 +305,3 @@ jobs:
             *.zip
             *.tar.gz
             *.tar.gz
-
-  # # Linux Build arm64
-  # linuxmultiarch:
-  #   runs-on: ubuntu-latest
-  #   name: Linux multi arch
-  #   steps:
-  #     - name: Clone Repository
-  #       uses: actions/checkout@v3
-
-  #     - name: Setup QEMU to Docker
-  #       uses: docker/setup-qemu-action@v1
-
-  #     - name: Setup Buildx
-  #       uses: docker/setup-buildx-action@v1
-
-  #     - name: Install Unzip and zip
-  #       env:
-  #         DEBIAN_FRONTEND: noninteractive
-  #       run: |
-  #         sudo apt update
-  #         sudo apt install -y unzip zip
-
-  #     - name: Build arm64
-  #       run: docker buildx build . --platform linux/arm64 --output type=local,dest=out_arm64
-
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: linux_multi
-  #         path: |
-  #           out_*/home/copiler/php_build_scripts/*.zip
-  #           out_*/home/copiler/php_build_scripts/*.tar.gz
-  #           out_*/home/copiler/php_build_scripts/*.log
-
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         name: Pocketmine
-  #         tag_name: "Pocketmine${{ github.run_id }}"
-  #         body: Windows
-  #         files: |
-  #           out_*/home/copiler/php_build_scripts/*.zip
-  #           out_*/home/copiler/php_build_scripts/*.tar.gz
