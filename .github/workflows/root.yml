@@ -128,7 +128,7 @@ jobs:
           sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
 
       - name: "Building php bin"
-        run: ./compile.sh -j$(nproc)
+        run: ./compile.sh -j$(nproc) -f -g
 
       - name: Create tarball (tar.gz)
         run: |
