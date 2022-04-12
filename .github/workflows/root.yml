@@ -223,7 +223,7 @@ jobs:
         continue-on-error: true
         run: |
           export PATH="/usr/local/opt/bison/bin:$PATH"
-          ./compile.sh -t mac-arm64 -j4 || (cat *.log && exit 1)
+          ./compile.sh -t mac-arm64 -j4 -x || (cat *.log && exit 1)
 
       - name: Create tarball
         run: |
