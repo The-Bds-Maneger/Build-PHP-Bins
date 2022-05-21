@@ -65,9 +65,6 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
-        with:
-          repository: pmmp/php-build-scripts
-          submodules: true
 
       - name: "Building (Docker)"
         run: docker buildx build . -o ./
