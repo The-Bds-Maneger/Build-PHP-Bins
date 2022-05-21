@@ -67,7 +67,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: "Building (Docker)"
-        run: docker buildx build . -o ./
+        run: docker buildx build . -o ./ --build-arg FILENAME=linux_x64
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
