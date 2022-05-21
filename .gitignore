@@ -1,3 +1,4 @@
 out_*/
+/tarball/
 *.tar.gz
 *.zip

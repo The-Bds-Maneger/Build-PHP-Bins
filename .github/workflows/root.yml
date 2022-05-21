@@ -7,57 +7,6 @@ on:
     - cron: "0 0 * * 6"
 
 jobs:
-  # Windows build
-  win32:
-    runs-on: windows-2019
-    name: Windows
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v3
-        with:
-          repository: pmmp/php-build-scripts
-          submodules: true
-
-      - name: Windows Depencies Install
-        run: choco install --no-progress wget
-
-      - name: "Building php bin"
-        run: .\windows-compile-vs.bat
-        env:
-          VS_EDITION: Enterprise
-          SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
-      
-      - name: show log
-        run: type compile.log
-
-      - name: Rename files
-        shell: node {0}
-        run: |
-          const fs = require("fs");
-          const path = require("path");
-          const files = fs.readdirSync(process.cwd()).filter(file => file.endsWith(".zip"));
-          for (const zip of files) {
-            console.log("File:", path.join(process.cwd(), zip));
-            if (/debug/i.test(zip)) fs.rmSync(path.join(process.cwd(), zip));
-            else fs.renameSync(path.join(process.cwd(), zip), path.join(process.cwd(), "win32_x64.zip"));
-          }
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows
-          path: "*.zip"
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: Pocketmine
-          tag_name: "Pocketmine${{ github.run_id }}"
-          body: Windows
-          files: "*.zip"
-
   # Android Build arm64
   android:
     runs-on: ubuntu-latest
@@ -120,27 +69,16 @@ jobs:
           repository: pmmp/php-build-scripts
           submodules: true
 
-      - name: Linux Depencies Install
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential make wget gzip bzip2 bison git cmake re2c autoconf automake pkg-config libtool* unzip zip tar
-
-      - name: "Building php bin"
-        run: ./compile.sh -j$(nproc) -f -g
-
-      - name: Create tarball (tar.gz)
-        run: |
-          cd bin/*
-          pwd
-          tar czfv ../../linux_x64.tar.gz *
+      - name: "Building (Docker)"
+        run: docker buildx build . -o ./
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: linux_x64
-          path: "*.tar.gz"
+          path: |
+            *.tar.gz
+            *.zip
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -150,7 +88,9 @@ jobs:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
           body: linux_x64
-          files: "*.tar.gz"
+          files: |
+            *.tar.gz
+            *.zip
 
       - name: Upload artifacts (root)
         uses: actions/upload-artifact@v2
@@ -205,10 +145,58 @@ jobs:
           name: darwin_x64_root
           path: ./
 
-  # MacOS Build
-  macosarm64:
-    runs-on: macos-latest
-    name: MacOS arm64
+  # # MacOS Build
+  # macosarm64:
+  #   runs-on: macos-latest
+  #   name: MacOS arm64
+  #   steps:
+  #     - name: Clone Repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         repository: pmmp/php-build-scripts
+  #         submodules: true
+
+  #     - name: Install dependecies
+  #       run: brew install libtool autoconf automake pkg-config bison re2c
+
+  #     - name: "Building php to MacOS arm64"
+  #       continue-on-error: true
+  #       run: |
+  #         export PATH="/usr/local/opt/bison/bin:$PATH"
+  #         ./compile.sh -t mac-arm64 -j4 -f -g || (cat *.log && exit 1)
+
+  #     - name: Create tarball
+  #       run: |
+  #         cd bin/*/
+  #         pwd
+  #         tar czfv ../../macos_arm64.tar.gz *
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: macos_arm64
+  #         path: "*.tar.gz"
+
+  #     - name: Release
+  #       uses: softprops/action-gh-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         name: Pocketmine
+  #         tag_name: "Pocketmine${{ github.run_id }}"
+  #         body: macos_arm64
+  #         files: "*.tar.gz"
+
+  #     - name: Upload artifacts (root)
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: macos_arm64_root
+  #         path: ./
+
+  # Windows build
+  win32:
+    runs-on: windows-2019
+    name: Windows
     steps:
       - name: Clone Repository
         uses: actions/checkout@v3
@@ -216,26 +204,35 @@ jobs:
           repository: pmmp/php-build-scripts
           submodules: true
 
-      - name: Install dependecies
-        run: brew install libtool autoconf automake pkg-config bison re2c
+      - name: Windows Depencies Install
+        run: choco install --no-progress wget
 
-      - name: "Building php to MacOS arm64"
-        continue-on-error: true
-        run: |
-          export PATH="/usr/local/opt/bison/bin:$PATH"
-          ./compile.sh -t mac-arm64 -j4 -f -g || (cat *.log && exit 1)
+      - name: "Building php bin"
+        run: .\windows-compile-vs.bat
+        env:
+          VS_EDITION: Enterprise
+          SOURCES_PATH: ${{ github.workspace }}\pocketmine-php-sdk
 
-      - name: Create tarball
+      - name: show log
+        run: type compile.log
+
+      - name: Rename files
+        shell: node {0}
         run: |
-          cd bin/*/
-          pwd
-          tar czfv ../../macos_arm64.tar.gz *
+          const fs = require("fs");
+          const path = require("path");
+          const files = fs.readdirSync(process.cwd()).filter(file => file.endsWith(".zip"));
+          for (const zip of files) {
+            console.log("File:", path.join(process.cwd(), zip));
+            if (/debug/i.test(zip)) fs.rmSync(path.join(process.cwd(), zip));
+            else fs.renameSync(path.join(process.cwd(), zip), path.join(process.cwd(), "win32_x64.zip"));
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: macos_arm64
-          path: "*.tar.gz"
+          name: Windows
+          path: "*.zip"
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -244,11 +241,5 @@ jobs:
         with:
           name: Pocketmine
           tag_name: "Pocketmine${{ github.run_id }}"
-          body: macos_arm64
-          files: "*.tar.gz"
-
-      - name: Upload artifacts (root)
-        uses: actions/upload-artifact@v2
-        with:
-          name: macos_arm64_root
-          path: ./
+          body: Windows
+          files: "*.zip"
