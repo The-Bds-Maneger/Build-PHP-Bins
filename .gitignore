@@ -1,4 +1,1 @@
-out_*/
-/tarball/
-*.tar.gz
-*.zip
+node_modules/
