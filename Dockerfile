@@ -8,7 +8,7 @@ RUN git clone https://github.com/pmmp/php-build-scripts.git /tmp/phpBuild
 WORKDIR /tmp/phpBuild
 
 # Build bin
-ARG EXTRAARGS=""
+ARG EXTRAARGS="-f -s"
 RUN ./compile.sh -j$(nproc) ${EXTRAARGS}
 
 # Create tarball
